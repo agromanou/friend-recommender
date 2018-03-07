@@ -9,6 +9,7 @@ class DataFetcher:
     @staticmethod
     def load_data():
         graph = [[1, 0],
+                 [1, 2],
                  [2, 3],
                  [3, 1],
                  [3, 0],
