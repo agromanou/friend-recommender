@@ -1,25 +1,42 @@
 from pprint import pprint
+import networkx as nx
+import json
 
 
 class DataFetcher:
-    def __init__(self):
-        self.graph = self.load_data()
-        self.network_dict = self.create_friend_dict(self.create_undirected_graph(self.graph))
+    def __init__(self, path):
+        self.graph = self.load_network(path)
+        print('Data loaded: {}'.format(len(self.graph)))
+
+        self.undirected = self.create_undirected_graph(self.graph)
+        print('Undirected graph has been created: {}'.format(len(self.undirected)))
+
+        self.network_dict = self.create_friend_dict(self.undirected)
 
     @staticmethod
-    def load_data():
-        graph = [[1, 0],
-                 [1, 2],
-                 [2, 3],
-                 [3, 1],
-                 [3, 0],
-                 [3, 4],
-                 [4, 5],
-                 [4, 6],
-                 [5, 4],
-                 [5, 6]]
+    def load_data_example():
+        graph = [['1', '0'], ['1', '2'], ['2', '3'],
+                 ['3', '1'], ['3', '0'], ['3', '4'],
+                 ['4', '5'], ['4', '6'], ['5', '4'],
+                 ['5', '6']]
 
         return graph
+
+    @staticmethod
+    def load_network(path):
+        """
+        This method loads the data form the given txt file
+        :return: list of lists with the edges of the graph
+        """
+        with open(path) as f:
+            content = f.read()
+
+        edge_str = content.split('\n')
+        network = list()
+        for edge in edge_str:
+            network.append(edge.split())
+
+        return network
 
     @staticmethod
     def create_undirected_graph(directed_graph):
@@ -28,13 +45,23 @@ class DataFetcher:
         :param directed_graph: list of lists with the directed graph
         :return: list of tuples with the undirected graph
         """
-        undirected_graph = directed_graph
-        for directed_edge in undirected_graph:
-            undirected_edge = [directed_edge[1], directed_edge[0]]
-            if undirected_edge not in undirected_graph:
+        undirected_graph = list()
+        for directed_edge in directed_graph:
+            try:
+                undirected_edge = [directed_edge[1], directed_edge[0]]
                 undirected_graph.append(undirected_edge)
+            except IndexError:
+                pass
 
-        return undirected_graph
+        return directed_graph + undirected_graph
+
+        # d_graph = nx.Graph()
+        # for element in directed_graph:
+        #     d_graph.add_path(element)
+        #
+        # undirected_graph = d_graph.to_undirected()
+        #
+        # return nx.edges(undirected_graph)
 
     @staticmethod
     def create_friend_dict(undirected_graph):
@@ -52,7 +79,17 @@ class DataFetcher:
 
         return network
 
+    @staticmethod
+    def save_network_to_file(network, file_name):
+        with open(file_name, 'w') as fp:
+            json.dump(network, fp)
+
 
 if __name__ == '__main__':
-    data_obj = DataFetcher()
+    file = '~/friend-recommender/data/facebook_combined.txt'
+
+    data_obj = DataFetcher(file)
+
+    pprint(data_obj.graph)
+    print(data_obj.undirected)
     pprint(data_obj.network_dict)
