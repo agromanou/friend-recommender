@@ -47,8 +47,8 @@ class DataFetcher:
         network = dict()
         for element in undirected_graph:
             if element[0] not in network.keys():
-                network[element[0]] = list()
-            network[element[0]].append(element[1])
+                network[element[0]] = set()
+            network[element[0]].add(element[1])
 
         return network
 
