@@ -76,9 +76,9 @@ class Recommendations:
         :return: a sorted list of nodes based on their score
         """
         sorted_nodes_score = sorted(nodes_dict.items(), key=operator.itemgetter(1), reverse=True)
-        sorted_nodes = list(map(lambda x: x[0], sorted_nodes_score))
+        # sorted_nodes = list(map(lambda x: x[0], sorted_nodes_score))
 
-        return sorted_nodes
+        return sorted_nodes_score
 
     def run_algorithm(self, node, algorithm):
         """
