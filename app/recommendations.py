@@ -1,9 +1,12 @@
 from pprint import pprint
 import operator
 import numpy as np
-
+import random
 
 class Recommendations:
+
+    SEED = 12356778
+
     def __init__(self, graph, number_of_suggestions=10):
         """
         :param graph: dict, of network nodes with a list of each node's friends
@@ -125,6 +128,67 @@ class Recommendations:
 
         self.recommendations = rec
 
+    def evaluate_scoring_functions(self):
+        """
+        This method evaluates which scoring function recommends the best links
+        """
+        times_of_execution = 0
+        while (times_of_execution < 100):
+
+            #Step 1: Randomly choose a real friend connection; call the two friends F1 and F2.
+            f1 = random.choice(list(self.graph.keys()))
+            if (len(self.graph[f1]) > 0) :
+                times_of_execution = times_of_execution + 1
+
+                f2 = random.choice(list(self.graph[f1]))
+                print('The ids of friends that are chosen for the evaluation purposes are f1 = ' + str(f1) + ' and f2 = ' + str(f2))
+
+                #Step 2: Remove their friendship from the graph.
+                print('Print the graph before removing the edge')
+                print(self.graph)
+                self.remove_edge(f1, f2)
+                print('Print the graph after removing the edge')
+                print(self.graph)
+
+                #Step 5: Put their friendship back in the graph.
+                print('Add again the edge to the original graph')
+                self.add_edge(f1, f2)
+                print(self.graph)
+
+            else:
+                continue
+
+    def remove_edge(self, e, e2):
+        try:
+            if self.graph != None:
+                if e in self.graph and e2 in self.graph[e]:
+                    self.graph[e].remove(e2)
+                if e2 in self.graph and e in self.graph[e2]:
+                    self.graph[e2].remove(e)
+            return True
+
+        except:
+            return None
+
+    def add_edge(self, f1, f2):
+        try:
+            if self.graph != None:
+                self.graph[f1].add(f2)
+                self.graph[f2].add(f1)
+            return True
+
+        except:
+            return None
+
+    def get_ids_multiple_to_100(self):
+        nodeId = 0
+        examined_facebook_users = []
+        for x in range(0, 40):
+            nodeId = nodeId + 100
+            examined_facebook_users.append(str(nodeId))
+
+        return examined_facebook_users
+
 
 if __name__ == '__main__':
     dict_ex = {'0': {'1', '3'},
@@ -145,3 +209,6 @@ if __name__ == '__main__':
 
     rec_obj.find_recommendations(score='adamic_adar')
     pprint(rec_obj.recommendations)
+
+    rec_obj.evaluate_scoring_functions()
+    print(rec_obj.get_ids_multiple_to_100())
