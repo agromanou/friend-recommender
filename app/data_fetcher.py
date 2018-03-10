@@ -73,9 +73,12 @@ class DataFetcher:
         """
         network = dict()
         for element in undirected_graph:
-            if element[0] not in network.keys():
-                network[element[0]] = set()
-            network[element[0]].add(element[1])
+            try:
+                if element[0] not in network.keys():
+                    network[element[0]] = set()
+                network[element[0]].add(element[1])
+            except IndexError:
+                pass
 
         return network
 
@@ -86,7 +89,7 @@ class DataFetcher:
 
 
 if __name__ == '__main__':
-    file = '~/friend-recommender/data/facebook_combined.txt'
+    file = '/Users/aggrom/Desktop/MSDS/5_Data_mining/Assignment_1/friend-recommender/data/facebook_combined.txt'
 
     data_obj = DataFetcher(file)
 
