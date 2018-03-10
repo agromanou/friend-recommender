@@ -75,8 +75,8 @@ class Recommendations:
         :param nodes_dict: dict. with the nodes and their score
         :return: a sorted list of nodes based on their score
         """
-        sorted_nodes_score = sorted(nodes_dict.items(), key=operator.itemgetter(1), reverse=True)
-        # sorted_nodes = list(map(lambda x: x[0], sorted_nodes_score))
+        # In the case of ties in friendship score yields the node with the smallest nodeID
+        sorted_nodes_score = [v for v in sorted(nodes_dict.items(), key=lambda kv: (-kv[1], kv[0]))]
 
         return sorted_nodes_score
 
