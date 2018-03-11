@@ -156,30 +156,68 @@ class Recommendations:
         This method evaluates which scoring function recommends the best links
         """
         times_of_execution = 0
+        algo_list = ['common_neighbors', 'jaccard', 'adamic_adar', 'cosine', 'baseline']
+        total_rank_list = {'common_neighbors': [], 'jaccard': [], 'adamic_adar': [], 'cosine': [], 'baseline': []}
         while (times_of_execution < 100):
-
-            #Step 1: Randomly choose a real friend connection; call the two friends F1 and F2.
+            comparison_list = dict()
+            # Step 1: Randomly choose a real friend connection; call the two friends F1 and F2.
             f1 = random.choice(list(self.graph.keys()))
-            if (len(self.graph[f1]) > 0) :
-                times_of_execution = times_of_execution + 1
+            if (len(self.graph[f1]) > 0):
 
                 f2 = random.choice(list(self.graph[f1]))
-                print('The ids of friends that are chosen for the evaluation purposes are f1 = ' + str(f1) + ' and f2 = ' + str(f2))
-
-                #Step 2: Remove their friendship from the graph.
-                print('Print the graph before removing the edge')
-                print(self.graph)
+                #print('The ids of friends that are chosen for the evaluation purposes are f1 = ' + str(f1) + ' and f2 = ' + str(f2))
+                # Step 2: Remove their friendship from the graph.
                 self.remove_edge(f1, f2)
-                print('Print the graph after removing the edge')
-                print(self.graph)
+                for method_name in algo_list:
 
-                #Step 5: Put their friendship back in the graph.
-                print('Add again the edge to the original graph')
+                    f1_list = self.run_algorithm(f1, method_name)
+                    f2_list = self.run_algorithm(f2, method_name)
+                    top10_f1 = f1_list[:10] if len(f1_list) > 10 else f1_list
+                    top10_f2 = f2_list[:10] if len(f2_list) > 10 else f2_list
+
+                    comparison_list[f1] = set()
+                    if len(top10_f1) > 0:
+                        for item in top10_f1:
+                            comparison_list[f1].add(item[0])
+
+                    comparison_list[f2] = set()
+                    if len(top10_f2) > 0:
+                        for item in top10_f2:
+                            comparison_list[f2].add(item[0])
+                    rank1 = -1
+                    rank2 = - 1
+                    i = 0
+                    for x in comparison_list[f1]:
+                        if f2 == x:
+                            rank1 = i + 1
+                            break
+                        else:
+                            i = i + 1
+                    i = 0
+                    for x in comparison_list[f2]:
+                        if f1 == x:
+                            rank2 = i + 1
+                            break
+                        else:
+                            i = i + 1
+                    if (rank1 != -1 and rank2 != -1):
+                        times_of_execution = times_of_execution + 1
+                        rank = round((rank1 + rank2)/2, 2)
+                        total_rank_list[method_name].append(rank)
+                    else :
+                        rank = 0
+
+                # Step 5: Put their friendship back in the graph.
                 self.add_edge(f1, f2)
-                print(self.graph)
 
             else:
                 continue
+        for item in total_rank_list:
+            average_rank = 0
+            if len(total_rank_list[item]) > 0 :
+                average_rank = round(sum(total_rank_list[item]) / len(total_rank_list[item]), 2)
+            print('The average rank of the correct recommendation for ' + item + ' is: ' + str(average_rank))
+            print(total_rank_list)
 
     def remove_edge(self, e, e2):
         try:
@@ -215,9 +253,9 @@ class Recommendations:
             
     def compute_the_number_users_with_the_same_first_and_different_10_recommendations(self):
         self.get_ids_multiple_to_100()
-        self.recommended_list_per_algorithm = {'common_neighbors': dict(), 'jaccard': dict(), 'adamic_adar': dict(), 'cosine': dict()}
+        self.recommended_list_per_algorithm = {'common_neighbors': dict(), 'jaccard': dict(), 'adamic_adar': dict(), 'cosine': dict(), ''baseline': dict()}
 
-        algo_list = ['common_neighbors', 'jaccard', 'adamic_adar', 'cosine']
+        algo_list = ['common_neighbors', 'jaccard', 'adamic_adar', 'cosine', 'baseline']
 
         for recommendation_method in algo_list:
             print('Testing the scoring function ' + recommendation_method)
