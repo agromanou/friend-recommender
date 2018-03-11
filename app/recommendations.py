@@ -199,15 +199,56 @@ class Recommendations:
             return None
 
     def get_ids_multiple_to_100(self):
+        """
+        This method gets 40 Facebook users with an id that is a multiple of 100
+        """
         nodeId = 0
-        examined_facebook_users = []
+        self.examined_facebook_users = []
         for x in range(0, 40):
             nodeId = nodeId + 100
-            examined_facebook_users.append(str(nodeId))
+            self.examined_facebook_users.append(str(nodeId))
 
-        return examined_facebook_users
+    def compute_the_number_users_with_the_same_first_and_different_10_recommendations(self):
+        self.get_ids_multiple_to_100()
+
+        algo_list = ['common_neighbors', 'jaccard', 'adamic_adar', 'cosine']
+
+        for recommendation_method in algo_list:
+            print('Testing the scoring function ' + recommendation_method)
+            comparsion_list = dict()
+            for facebook_usr in self.examined_facebook_users:
+                recommendation_list = self.run_algorithm(facebook_usr, recommendation_method)
+                top_ten_friends = recommendation_list[:10] if len(recommendation_list) > 10 else recommendation_list
+                comparsion_list[facebook_usr] = set()
+                if len(top_ten_friends) > 0:
+                    for item in top_ten_friends:
+                       comparsion_list[facebook_usr].add(item[0])
 
 
+            list_of_similar_recommendations = set()
+            list_of_different_recommendations = set()
+            i = 0
+            for user1 in self.examined_facebook_users:
+                if i < 39:
+                    compared_list1 = comparsion_list[self.examined_facebook_users[i]]
+                    for fb_user in self.examined_facebook_users[i + 1:]:
+                        compared_list2 = comparsion_list[fb_user]
+                        if (len(compared_list2) == 10 and len(compared_list1) == len(compared_list2) and len(compared_list1 & compared_list2) == 10):
+                            if fb_user not in list_of_similar_recommendations:
+                                list_of_similar_recommendations.add(fb_user)
+                            if user1 not in list_of_similar_recommendations:
+                                list_of_similar_recommendations.add(user1)
+                        else :
+                            if fb_user not in list_of_different_recommendations:
+                                list_of_different_recommendations.add(fb_user)
+                            if user1 not in list_of_different_recommendations:
+                                list_of_different_recommendations.add(user1)
+                i = i + 1
+            print('The number of Facebook users who have the same first 10 friend recommendations is ' + str(len(list_of_similar_recommendations)))
+            print('The number of Facebook users who have the different first 10 friend recommendations is ' + str(len(list_of_different_recommendations)))
+            print('\n')
+
+            
 if __name__ == '__main__':
     dict_ex = {'0': {'1', '3'},
                '1': {'0', '2', '3'},
