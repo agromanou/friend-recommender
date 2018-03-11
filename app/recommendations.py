@@ -106,30 +106,35 @@ class Recommendations:
         :return: list with sorted candidate node recommendations
         """
         node_rec = dict()
-        for candidate_node in self.graph:
+        for friend_node in self.graph[node]:
 
-            # accept candidate nodes that are different the given node and are not
-            # present in the friend list of the current node
-            if candidate_node != node and candidate_node not in self.graph[node]:
+            for friend_of_friend_node in self.graph[friend_node]:
 
-                if algorithm == 'common_neighbors':
-                    score = self.run_common_neighbors(node, candidate_node)
+                # accept candidate nodes that are different the given node and are not
+                # present in the friend list of the current node
+                if friend_of_friend_node != node and friend_of_friend_node not in self.graph[node]:
 
-                elif algorithm == 'jaccard':
-                    score = self.run_jaccard(node, candidate_node)
+                    if algorithm == 'common_neighbors':
+                        score = self.run_common_neighbors(node, friend_of_friend_node)
 
-                elif algorithm == 'adamic_adar':
-                    score = self.run_adamin_adar(node, candidate_node)
+                    elif algorithm == 'jaccard':
+                        score = self.run_jaccard(node, friend_of_friend_node)
 
-                elif algorithm == 'cosine':
-                    score = self.run_cosine(node, candidate_node)
+                    elif algorithm == 'adamic_adar':
+                        score = self.run_adamin_adar(node, friend_of_friend_node)
+
+                    elif algorithm == 'cosine':
+                        score = self.run_cosine(node, friend_of_friend_node)
+
+                    elif algorithm == 'baseline':
+                        score = random.randint(0, len(self.graph))
 
                 else:
                     score = 0
 
                 # ignore nodes with zero common friends (score)
                 if score != 0:
-                    node_rec[candidate_node] = score
+                    node_rec[friend_of_friend_node] = score
 
         return self.sort_nodes(node_rec)
 
@@ -311,5 +316,36 @@ if __name__ == '__main__':
     print('Cosine results')
     pprint(rec_obj.recommendations)
 
-    rec_obj.evaluate_scoring_functions()
-    print(rec_obj.get_ids_multiple_to_100())
+    # rec_obj.evaluate_scoring_functions()
+    # print(rec_obj.get_ids_multiple_to_100())
+
+    rec_obj.find_recommendations(score='common_neighbors')
+    print()
+    print('-'*30)
+    print('Common neighbors results')
+    pprint(rec_obj.recommendations)
+    print('-'*30)
+
+    rec_obj.find_recommendations(score='jaccard')
+    print()
+    print('-'*30)
+    print('Jaccard results')
+    pprint(rec_obj.recommendations)
+
+    rec_obj.find_recommendations(score='adamic_adar')
+    print()
+    print('-'*30)
+    print('Adamic & Adar results')
+    pprint(rec_obj.recommendations)
+
+    rec_obj.find_recommendations(score='cosine')
+    print()
+    print('-' * 30)
+    print('Cosine results')
+    pprint(rec_obj.recommendations)
+
+    rec_obj.find_recommendations(score='baseline')
+    print()
+    print('-' * 30)
+    print('Baseline results')
+    pprint(rec_obj.recommendations)
