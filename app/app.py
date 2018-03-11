@@ -12,15 +12,7 @@ if __name__ == '__main__':
 
     recommender = Recommendations(graph)
 
-    t = recommender.run_algorithm('100', 'common_neighbors')
-    top_ten_friends = t[:10] if len(t) > 10 else t
-    to_compare = dict()
-    to_compare['100'] = set()
-
-    if len(top_ten_friends) > 0:
-        for item in top_ten_friends:
-            print(item)
-            to_compare['100'].add(item[0])
+    recommender.compute_the_number_users_with_the_same_first_and_different_10_recommendations()
 
     for algo in algo_list:
         print()
