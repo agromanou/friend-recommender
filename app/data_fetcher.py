@@ -6,16 +6,16 @@ import json
 class DataFetcher:
     def __init__(self, path):
         self.graph = self.load_network(path)
-        print('Data loaded: {}'.format(len(self.graph)))
+        # print('Data loaded: {}'.format(len(self.graph)))
 
         self.undirected = self.create_undirected_graph(self.graph)
-        print('Undirected graph has been created: {}'.format(len(self.undirected)))
+        # print('Undirected graph has been created: {}'.format(len(self.undirected)))
 
         self.network_dict = self.create_friend_dict(self.undirected)
 
     @staticmethod
     def load_data_example():
-        graph = [['1', '0'], ['1', '2'], ['2', '3'],
+        graph = [['1', '0'], ['2', '3'],
                  ['3', '1'], ['3', '0'], ['3', '4'],
                  ['4', '5'], ['4', '6'], ['5', '4'],
                  ['5', '6']]
@@ -93,6 +93,13 @@ if __name__ == '__main__':
 
     data_obj = DataFetcher(file)
 
+    print('Initial graph - edges')
     pprint(data_obj.graph)
-    print(data_obj.undirected)
+    print('-'*30)
+    print('Undirected graph - edge')
+    pprint(data_obj.undirected)
+    print('-'*30)
+    print('Undirected graph - dictionary')
     pprint(data_obj.network_dict)
+
+

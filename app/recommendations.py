@@ -1,7 +1,7 @@
 from pprint import pprint
-import operator
 import numpy as np
 import random
+
 
 class Recommendations:
 
@@ -35,8 +35,8 @@ class Recommendations:
 
     def run_jaccard(self, node, candidate_node):
         """
-        This method calculates jaccard distance score for user similarity, i.e. measures the number
-        of common friends of two nodes that are not yet friends devided by their friends' union
+        This method calculates Jaccard distance score for user similarity, i.e. measures the number
+        of common friends of two nodes that are not yet friends divided by their friends' union
         :param node: id of a node
         :param candidate_node: id of a node
         :return: int, the Jaccard score
@@ -48,7 +48,7 @@ class Recommendations:
 
         score = len(common_nodes) / len(union)
 
-        return score
+        return round(score, 4)
 
     def run_adamin_adar(self, node, candidate_node):
         """
@@ -69,7 +69,22 @@ class Recommendations:
             except TypeError:
                 score += 0
 
-        return score
+        return round(score, 4)
+
+    def run_cosine(self, node, candidate_node):
+        """
+        This method calculates cosine similarity score, i.e. measures the cosine of the angle
+        between the characteristic vectors of the two neighborhoods.
+        :param candidate_node: id of a node
+        :return: int, the cosine score
+        """
+        set_a = self.graph[node]
+        set_b = self.graph[candidate_node]
+        common_nodes = set_a & set_b
+
+        score = len(common_nodes) / np.sqrt(len(set_a)*len(set_b))
+
+        return round(score, 4)
 
     @staticmethod
     def sort_nodes(nodes_dict):
@@ -105,6 +120,9 @@ class Recommendations:
 
                 elif algorithm == 'adamic_adar':
                     score = self.run_adamin_adar(node, candidate_node)
+
+                elif algorithm == 'cosine':
+                    score = self.run_cosine(node, candidate_node)
 
                 else:
                     score = 0
@@ -202,12 +220,36 @@ if __name__ == '__main__':
     rec_obj = Recommendations(dict_ex)
 
     rec_obj.find_recommendations(score='common_neighbors')
+    print()
+    print('Toy example')
+    pprint(dict_ex)
+    print('-'*30)
+    print('Common neighbors results')
     pprint(rec_obj.recommendations)
+    print('-'*30)
 
     rec_obj.find_recommendations(score='jaccard')
+    print()
+    print('Toy example')
+    pprint(dict_ex)
+    print('-'*30)
+    print('Jaccard results')
     pprint(rec_obj.recommendations)
 
     rec_obj.find_recommendations(score='adamic_adar')
+    print()
+    print('Toy example')
+    pprint(dict_ex)
+    print('-'*30)
+    print('Adamic & Adar results')
+    pprint(rec_obj.recommendations)
+
+    rec_obj.find_recommendations(score='cosine')
+    print()
+    print('Toy example')
+    pprint(dict_ex)
+    print('-' * 30)
+    print('Cosine results')
     pprint(rec_obj.recommendations)
 
     rec_obj.evaluate_scoring_functions()
