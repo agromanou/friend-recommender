@@ -207,9 +207,10 @@ class Recommendations:
         for x in range(0, 40):
             nodeId = nodeId + 100
             self.examined_facebook_users.append(str(nodeId))
-
+            
     def compute_the_number_users_with_the_same_first_and_different_10_recommendations(self):
         self.get_ids_multiple_to_100()
+        self.recommended_list_per_algorithm = {'common_neighbors': dict(), 'jaccard': dict(), 'adamic_adar': dict(), 'cosine': dict()}
 
         algo_list = ['common_neighbors', 'jaccard', 'adamic_adar', 'cosine']
 
@@ -224,7 +225,7 @@ class Recommendations:
                     for item in top_ten_friends:
                        comparsion_list[facebook_usr].add(item[0])
 
-
+            self.recommended_list_per_algorithm[recommendation_method] = comparsion_list
             list_of_similar_recommendations = set()
             list_of_different_recommendations = set()
             i = 0
@@ -248,7 +249,24 @@ class Recommendations:
             print('The number of Facebook users who have the different first 10 friend recommendations is ' + str(len(list_of_different_recommendations)))
             print('\n')
 
-            
+    def compute_similarity_percentage(self, methodA = 'common_neighbors', methodB = 'jaccard'):
+        recommendation_list1 = self.recommended_list_per_algorithm[methodA]
+        recommendation_list2 = self.recommended_list_per_algorithm[methodB]
+
+        number_of_similar_rec = 0
+        total_number_of_rec = 0
+        for fb_usr in self.examined_facebook_users:
+
+            listA = recommendation_list1[fb_usr]
+            listB = recommendation_list2[fb_usr]
+            number_of_similar_rec = number_of_similar_rec + len(listA & listB)
+            total_number_of_rec = total_number_of_rec + max(len(listA), len(listB))
+
+        similarity_percentage = round((number_of_similar_rec * 100) / total_number_of_rec, 2)
+        print('The similarity percentage of the recommended friend lists for the 40 users for pair ' + methodA + ' - ' + methodB + ' is: ' + str(similarity_percentage) + '%')
+        return similarity_percentage
+    
+    
 if __name__ == '__main__':
     dict_ex = {'0': {'1', '3'},
                '1': {'0', '2', '3'},
