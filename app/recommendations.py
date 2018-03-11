@@ -163,7 +163,7 @@ class Recommendations:
             # Step 1: Randomly choose a real friend connection; call the two friends F1 and F2.
             f1 = random.choice(list(self.graph.keys()))
             if (len(self.graph[f1]) > 0):
-
+                times_of_execution = times_of_execution + 1
                 f2 = random.choice(list(self.graph[f1]))
                 #print('The ids of friends that are chosen for the evaluation purposes are f1 = ' + str(f1) + ' and f2 = ' + str(f2))
                 # Step 2: Remove their friendship from the graph.
@@ -201,7 +201,6 @@ class Recommendations:
                         else:
                             i = i + 1
                     if (rank1 != -1 and rank2 != -1):
-                        times_of_execution = times_of_execution + 1
                         rank = round((rank1 + rank2)/2, 2)
                         total_rank_list[method_name].append(rank)
                     else :
@@ -217,9 +216,12 @@ class Recommendations:
             if len(total_rank_list[item]) > 0 :
                 average_rank = round(sum(total_rank_list[item]) / len(total_rank_list[item]), 2)
             print('The average rank of the correct recommendation for ' + item + ' is: ' + str(average_rank))
-            print(total_rank_list)
 
     def remove_edge(self, e, e2):
+        """
+        This method removes an edge from the graph
+        :return: True or None
+        """
         try:
             if self.graph != None:
                 if e in self.graph and e2 in self.graph[e]:
@@ -252,6 +254,9 @@ class Recommendations:
             self.examined_facebook_users.append(str(nodeId))
             
     def compute_the_number_users_with_the_same_first_and_different_10_recommendations(self):
+        """
+        This method computes the number of users with same and different top 10 recommendations
+        """
         self.get_ids_multiple_to_100()
         self.recommended_list_per_algorithm = {'common_neighbors': dict(), 'jaccard': dict(), 'adamic_adar': dict(), 'cosine': dict(), ''baseline': dict()}
 
@@ -293,6 +298,10 @@ class Recommendations:
             print('\n')
 
     def compute_similarity_percentage(self, methodA = 'common_neighbors', methodB = 'jaccard'):
+        """
+        This method computes the average similarity between 2 methods
+        :return: float. The average similarity
+        """                                       
         recommendation_list1 = self.recommended_list_per_algorithm[methodA]
         recommendation_list2 = self.recommended_list_per_algorithm[methodB]
 
