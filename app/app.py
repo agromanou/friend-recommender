@@ -29,6 +29,8 @@ if __name__ == '__main__':
     average_similarity = round((total/ len(percentages)), 2)
     print('The average similarity between the algorithms is: ' + str(average_similarity))
     
+    recommender.evaluate_scoring_functions()
+    
     for algo in algo_list:
         print()
         print()
